@@ -1,0 +1,14 @@
+linuxswap:
+- allow block sizes other than 4k
+
+ext:
+- allow finding superblocks other than the first one
+
+ffs:
+- get rid of spurious pre-echo partitions
+- test with freebsd and netbsd
+- test with openbsd ufs2
+
+overall:
+- find and fix terrible bug with buffering
+
