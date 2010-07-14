@@ -73,6 +73,8 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "\r\033[Kread %lldMiB\r", (long long)(read_total>>20));
 
             read_total += read_now;
+            if ( read_now == READ_BUFFER_SIZE )
+                read_total -= READ_BUFFER_OVERLAP;
             lseek(eo.fh, read_total, SEEK_SET);
         }
 
