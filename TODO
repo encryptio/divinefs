@@ -8,6 +8,7 @@ ffs:
 - get rid of spurious pre-echo partitions
 - test with freebsd and netbsd
 - test with openbsd ufs2
+- find out if the fs_id is actually formatted a particular way
 
 overall:
 - find and fix terrible bug with buffering

@@ -17,6 +17,11 @@ void check_ffs(exec_options *eo, off_t offset) {
     if ( offset < 0 )
         return;
 
+    // read some basic information
+    uint32_t fs_id[2];
+    fs_id[0] = read_le_uint32(eo->fh, offset+144);
+    fs_id[1] = read_le_uint32(eo->fh, offset+148);
+
     bool show_mountpoint = true;
     char mountpoint[468];
     lseek(eo->fh, offset+768, SEEK_SET);
@@ -57,6 +62,8 @@ void check_ffs(exec_options *eo, off_t offset) {
             printf("ufs%d filesystem at offset %s\n", ver, format_offset(eo, offset-16384-(ver == 1 ? 0 : 65536)));
             if ( show_mountpoint )
                 printf("    last mounted on %s\n", mountpoint);
+            if ( eo->verbose )
+                printf("    filesystem id %04x-%04x\n", fs_id[0], fs_id[1]);
             printf("    filesystem size %llu 512-blocks = %llu bytes ~= %s\n",
                     (long long unsigned int) fs_size/512,
                     (long long unsigned int) fs_size,
