@@ -2,7 +2,7 @@
 #define __MAIN_H__
 
 #define READ_BUFFER_SIZE (1<<20)
-#define READ_BUFFER_OVERLAP (1<<12)
+#define READ_BUFFER_OVERLAP 0
 
 #include <stdbool.h>
 
