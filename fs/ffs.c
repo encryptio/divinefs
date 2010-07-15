@@ -54,7 +54,10 @@ void check_ffs(exec_options *eo, off_t offset) {
     else
         errx(1, "NOT REACHED");
 
+    // sanity checks
     if ( fragment_size > 131072 || fragment_size < 512 || basic_size > 131072 || basic_size < 512 )
+        return;
+    if ( fragment_size & 0xFF || basic_size & 0xFF )
         return;
 
     switch ( eo->part_format_type ) {
