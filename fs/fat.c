@@ -3,15 +3,10 @@
 void check_fat(exec_options *eo, off_t offset) {
     uint8_t bits = 0;
 
-    // verify generic windows filesystem magic, always present
-    uint8_t tail_magic[2] = { 0, };
-    lseek(eo->fh, offset+510, SEEK_SET);
-    read(eo->fh, tail_magic, 2);
-    if ( memcmp(tail_magic, "\x55\xAA", 2) != 0 )
-        return;
-
     uint16_t sector_size = read_le_uint16(eo->fh, offset+11);
     if ( sector_size & 0xFF )
+        return;
+    if ( sector_size < 512 || sector_size > 4096 )
         return;
 
     uint8_t sectors_per_cluster = read_uint8(eo->fh, offset+13);
@@ -24,6 +19,10 @@ void check_fat(exec_options *eo, off_t offset) {
 
     uint8_t fat_count = read_uint8(eo->fh, offset+16);
     if ( fat_count == 0 )
+        return;
+
+    uint8_t media = read_uint8(eo->fh, offset+21);
+    if ( !(0xF8 <= media || 0xF0 == media) )
         return;
 
     uint32_t fat_length = read_le_uint16(eo->fh, offset+22);

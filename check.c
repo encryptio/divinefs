@@ -44,12 +44,7 @@ void check_buffer_all(exec_options *eo, uint8_t *buf, size_t len, off_t fileoffs
             check_ntfs(eo, poss+fileoffset);
 
         // FAT
-        if ( (buf[poss+14] != 0 || buf[poss+15] != 0) // reserved nonzero
-                && (buf[poss+16] != 0) // number of fats
-                && (0xF8 <= buf[poss+21] || 0xF0 == buf[poss+21]) // "media" field
-                && (buf[poss+11] + buf[poss+12]*256 >= 512) // sector_size
-                && (buf[poss+11] + buf[poss+12]*256 <= 4096) // sector_size again
-                )
+        if ( memcmp("\x55\xAA", buf+poss+0x1FE, 2) == 0 )
             check_fat(eo, poss+fileoffset);
 
         if ( memcmp("H+", buf+poss, 2) == 0 ) // HFS+
