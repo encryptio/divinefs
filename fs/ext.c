@@ -89,32 +89,47 @@ void check_ext(exec_options *eo, off_t offset) {
 
     switch ( eo->part_format_type ) {
         case part_format_bsdlabel:
-            printf("%s", format_bsdlabel(eo, ver == 3 ? "ext3fs" : ver == 4 ? "ext4fs" : "ext2fs", offset-1024, block_count*block_size, mountpoint));
+            // the bsds only supports "ext2fs"
+            // we mark the version here so that an error occurs if the user tries
+            // to use this line without knowing what they're doing
+            printf("  X: % 13lld % 13lld %s                    # %s\n",
+                    (long long int) block_count*block_size,
+                    (long long int) offset-1024,
+                    ver == 3 ? "ext3fs" : ver == 4 ? "ext4fs" : "ext2fs",
+                    mountpoint);
             break;
 
         default:
             printf("ext%d filesystem at offset %s\n", ver, format_offset(eo, offset-1024));
+
             if ( !clean || needs_journal_playback || eo->verbose )
                 printf("    %s %s\n", status_str, needs_journal_playback ? "(needs journal playback)" : "");
+
             if ( show_mountpoint )
                 printf("    last mounted on %s\n", mountpoint);
+
             printf("    filesystem size %llu 512-blocks = %llu bytes ~= %s\n",
                     (long long unsigned int) block_count*block_size/512,
                     (long long unsigned int) block_count*block_size,
                     format_humansize(eo, ((off_t)block_count)*((off_t)block_size)));
+
             printf("    uuid %s\n", format_uuid(eo, uuid));
+
             if ( compat_features )
                 printf("    unknown compat feature bits: 0x%x", compat_features);
             if ( incompat_features )
                 printf("    unknown incompat feature bits: 0x%x", incompat_features);
             if ( readonly_features )
                 printf("    unknown readonly feature buts: 0x%x", readonly_features);
+
             if ( eo->verbose ) {
                 printf("    block size %d bytes\n", block_size);
+
                 printf("    free blocks %llu/%llu (%d%%)\n",
                         (long long unsigned int) blocks_free,
                         (long long unsigned int) block_count,
                         (int) (((off_t) blocks_free*100)/block_count));
+
                 printf("    free inodes %llu/%llu (%d%%)\n",
                         (long long unsigned int) inodes_free,
                         (long long unsigned int) inodes_count,
