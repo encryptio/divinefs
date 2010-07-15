@@ -37,7 +37,7 @@ void check_ntfs(exec_options *eo, off_t offset) {
         case part_format_bsdlabel:
             printf("  X: % 16lld % 16lld   NTFS\n",
                     (long long) (fs_size+512)/512,
-                    (long long) offset);
+                    (long long) offset/512);
             break;
 
         default:

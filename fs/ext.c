@@ -93,8 +93,8 @@ void check_ext(exec_options *eo, off_t offset) {
             // we mark the version here so that an error occurs if the user tries
             // to use this line without knowing what they're doing
             printf("  X: % 16lld % 16lld %s                    # %s\n",
-                    (long long int) block_count*block_size,
-                    (long long int) offset-1024,
+                    (long long int) block_count*block_size/512,
+                    (long long int) (offset-1024)/512,
                     ver == 3 ? "ext3fs" : ver == 4 ? "ext4fs" : "ext2fs",
                     mountpoint);
             break;

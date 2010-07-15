@@ -76,7 +76,7 @@ void check_fat(exec_options *eo, off_t offset) {
         case part_format_bsdlabel:
             printf("  X: % 16lld % 16lld  MSDOS\n",
                     (long long) fs_size/512,
-                    (long long) offset);
+                    (long long) offset/512);
             break;
 
         default:
