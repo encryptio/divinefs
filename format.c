@@ -92,11 +92,13 @@ char *format_humansize(exec_options *eo, off_t size) {
     if ( format_humansize_which >= FORMAT_NBUFS )
         format_humansize_which = 0;
 
+    size *= 10;
+
     int idx = 0;
 
-    while ( (size > 10000) && (idx < 4) ) {
+    while ( (size >= 10000) && (idx < 4) ) {
         if ( idx == 0 )
-            size /= 102;
+            size /= 1024;
         else
             size /= 1024;
         idx++;
@@ -105,7 +107,7 @@ char *format_humansize(exec_options *eo, off_t size) {
     char *formats[] = { "B", "KiB", "MiB", "GiB", "TiB" };
 
     if ( idx == 0 ) {
-        snprintf(ret, FORMAT_HUMANSIZE_LENGTH, "%lluB", (long long unsigned int) size);
+        snprintf(ret, FORMAT_HUMANSIZE_LENGTH, "%lluB", (long long unsigned int) size/10);
     } else {
         snprintf(ret, FORMAT_HUMANSIZE_LENGTH, "%llu.%d%s", (long long unsigned int) (size/10), (int) (size % 10), formats[idx]);
     }
