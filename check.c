@@ -13,6 +13,7 @@
 #include "fs/ffs.h"
 #include "fs/reiserfs.h"
 #include "fs/btrfs.h"
+#include "fs/ntfs.h"
 
 void check_buffer_all(exec_options *eo, uint8_t *buf, size_t len, off_t fileoffset) {
     for (int poss = 0; poss < len; poss += 512) {
@@ -36,6 +37,9 @@ void check_buffer_all(exec_options *eo, uint8_t *buf, size_t len, off_t fileoffs
 
         if ( memcmp("_BHRfS_M", buf+poss+0x40, 8) == 0 )
             check_btrfs(eo, poss+fileoffset);
+
+        if ( memcmp("NTFS    ", buf+poss+0x03, 8) == 0 )
+            check_ntfs(eo, poss+fileoffset);
     }
 
     /* TODO: HFS+
