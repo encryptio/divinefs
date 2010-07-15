@@ -5,10 +5,7 @@ ext:
 - allow finding superblocks other than the first one
 
 ffs:
-- get rid of spurious pre-echo partitions
 - test with freebsd and netbsd
-- test with openbsd ufs2
-- find out if the fs_id is actually formatted a particular way
 
 reiserfs:
 - more thorough testing with real volumes

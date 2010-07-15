@@ -24,7 +24,7 @@ void check_ffs(exec_options *eo, off_t offset) {
 
     bool show_mountpoint = true;
     char mountpoint[468];
-    lseek(eo->fh, offset+768, SEEK_SET);
+    lseek(eo->fh, offset+212, SEEK_SET);
     read(eo->fh, mountpoint, 468);
 
     // make sure the mountpoint text is printable
@@ -60,9 +60,32 @@ void check_ffs(exec_options *eo, off_t offset) {
     if ( fragment_size & 0xFF || basic_size & 0xFF )
         return;
 
+    // there are two superblocks at the start of every UFS partition.
+    // for UFS1, the second superblock is at +8192B
+    // for UFS2, the second superblock is at +16384B
+    // make sure the magic and fs_id in the superblock backup are the same.
+
+    off_t alt_offset = offset + (ver == 1 ? 8192 : 16384);
+
+    uint32_t fs_id2[2];
+    fs_id2[0] = read_le_uint32(eo->fh, alt_offset+144);
+    fs_id2[1] = read_le_uint32(eo->fh, alt_offset+148);
+
+    if ( memcmp(fs_id, fs_id2, 8) != 0 )
+        return;
+
+    uint32_t magic2 = read_le_uint32(eo->fh, alt_offset+1024+348);
+    if ( magic != magic2 )
+        return;
+
+    // finally, adjust the offset to be equal to the start of the partition,
+    // rather than the first superblock in the partition. again, UFS1/2 differ.
+
+    offset -= ver == 1 ? 8192 : 65536;
+
     switch ( eo->part_format_type ) {
         default:
-            printf("ufs%d filesystem at offset %s\n", ver, format_offset(eo, offset-16384-(ver == 1 ? 0 : 65536)));
+            printf("ufs%d filesystem at offset %s\n", ver, format_offset(eo, offset));
             if ( show_mountpoint )
                 printf("    last mounted on %s\n", mountpoint);
             if ( eo->verbose )
