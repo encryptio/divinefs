@@ -12,6 +12,7 @@
 #include "fs/linuxswap.h"
 #include "fs/ffs.h"
 #include "fs/reiserfs.h"
+#include "fs/btrfs.h"
 
 void check_buffer_all(exec_options *eo, uint8_t *buf, size_t len, off_t fileoffset) {
     for (int poss = 0; poss < len; poss += 512) {
@@ -32,6 +33,9 @@ void check_buffer_all(exec_options *eo, uint8_t *buf, size_t len, off_t fileoffs
             check_reiserfs(eo, poss+fileoffset);
         if ( memcmp("ReIsEr3Fs", buf+poss+0x34, 9) == 0 ) // reiserfs jr
             check_reiserfs(eo, poss+fileoffset);
+
+        if ( memcmp("_BHRfS_M", buf+poss+0x40, 8) == 0 )
+            check_btrfs(eo, poss+fileoffset);
     }
 
     /* TODO: HFS+
