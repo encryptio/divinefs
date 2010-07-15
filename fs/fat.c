@@ -60,8 +60,8 @@ void check_fat(exec_options *eo, off_t offset) {
         default:
             printf("fat%d filesystem at offset %s\n", bits, format_offset(eo, offset));
             printf("    filesystem size %llu 512-blocks = %llu bytes ~= %s\n",
-                    (long long unsigned int) fs_size,
                     (long long unsigned int) fs_size/512,
+                    (long long unsigned int) fs_size,
                     format_humansize(eo, fs_size));
             if ( eo->verbose ) {
                 printf("    number of fats %d\n", fat_count);
