@@ -48,5 +48,10 @@ void check_ntfs(exec_options *eo, off_t offset) {
                     format_humansize(eo, fs_size));
             printf("\n");
     }
+
+    if ( !eo->skip_active ) {
+        eo->skip_active = true;
+        eo->skip_to = offset+fs_size+512;
+    }
 }
 

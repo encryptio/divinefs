@@ -15,10 +15,11 @@
 
 void usage(char *name) {
     fprintf(stderr, "Usage:\n");
-    fprintf(stderr, "    %s [ -v ] [ -s START ] [ -e END ] [ -f format ] ( file | device )\n", name);
+    fprintf(stderr, "    %s [ -vS ] [ -s START ] [ -e END ] [ -f format ] ( file | device )\n", name);
     fprintf(stderr, "    %s -h\n", name);
     fprintf(stderr, "\n");
     fprintf(stderr, "-v: verbose\n");
+    fprintf(stderr, "-S: skip interior of partitions as they're found\n");
     fprintf(stderr, "-s/-e: Start and end blocks for the search (in 512-byte blocks)\n");
     fprintf(stderr, "-f: output format. valid formats:\n");
     fprintf(stderr, "    talkative (default): spew enough information to make the partition, and as\n");
@@ -39,6 +40,8 @@ int main(int argc, char **argv) {
     eo.part_format_type = part_format_talkative;
     eo.start_block = 0;
     eo.has_end_block = false;
+    eo.skip_partitions = false;
+    eo.skip_active = false;
 
     while ( true ) {
         static struct option long_options[] = {
@@ -47,16 +50,21 @@ int main(int argc, char **argv) {
             { "start-block", 0, NULL, 's' },
             { "end-block", 0, NULL, 'e' },
             { "format", 0, NULL, 'f' },
+            { "skip", 0, NULL, 'S' },
             { NULL, 0, NULL, 0 }
         };
 
-        int c = getopt_long(argc, argv, "vhs:e:f:", long_options, NULL);
+        int c = getopt_long(argc, argv, "vShs:e:f:", long_options, NULL);
         if ( c == -1 )
             break;
 
         switch (c) {
             case 'v':
                 eo.verbose = 1;
+                break;
+
+            case 'S':
+                eo.skip_partitions = true;
                 break;
 
             case 'h':
@@ -137,6 +145,12 @@ int main(int argc, char **argv) {
 
         if ( read_now == READ_BUFFER_SIZE )
             read_total -= READ_BUFFER_OVERLAP;
+
+        if ( eo.skip_partitions && eo.skip_active ) {
+            read_total = eo.skip_to-eo.start_block*512;
+            eo.skip_active = 0;
+        }
+
         lseek(eo.fh, read_total+eo.start_block*512, SEEK_SET);
     }
     if ( read_now == -1 )

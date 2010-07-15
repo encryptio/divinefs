@@ -27,6 +27,10 @@ typedef struct exec_options {
     bool has_end_block;
     off_t end_block;
 
+    bool skip_partitions;
+    bool skip_active;
+    off_t skip_to;
+
     enum offset_format_type offset_format_type;
     enum part_format_type part_format_type;
 } exec_options;

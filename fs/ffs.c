@@ -108,5 +108,10 @@ void check_ffs(exec_options *eo, off_t offset) {
             printf("    fsize=%d bsize=%d cpg=%d\n", fragment_size, basic_size, cpg);
             printf("\n");
     }
+
+    if ( !eo->skip_active ) {
+        eo->skip_active = true;
+        eo->skip_to = offset+fs_size;
+    }
 }
 

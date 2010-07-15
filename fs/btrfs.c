@@ -61,5 +61,10 @@ void check_btrfs(exec_options *eo, off_t offset) {
             }
             printf("\n");
     }
+
+    if ( !eo->skip_active ) {
+        eo->skip_active = true;
+        eo->skip_to = offset-this_super_offset_from_start+dev_fs_size;
+    }
 }
 

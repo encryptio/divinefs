@@ -26,5 +26,10 @@ void check_linuxswap(exec_options *eo, off_t offset) {
                 printf("    page count %lu\n", (long unsigned) page_count);
             printf("\n");
     }
+
+    if ( !eo->skip_active ) {
+        eo->skip_active = true;
+        eo->skip_to = offset+fs_size;
+    }
 }
 

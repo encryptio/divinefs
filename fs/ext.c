@@ -137,5 +137,10 @@ void check_ext(exec_options *eo, off_t offset) {
             }
             printf("\n");
     }
+
+    if ( !eo->skip_active ) {
+        eo->skip_active = true;
+        eo->skip_to = offset-1024+(off_t)block_count*block_size;
+    }
 }
 
