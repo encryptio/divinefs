@@ -15,6 +15,7 @@
 #include "fs/btrfs.h"
 #include "fs/ntfs.h"
 #include "fs/fat.h"
+#include "fs/hfsplus.h"
 
 void check_buffer_all(exec_options *eo, uint8_t *buf, size_t len, off_t fileoffset) {
     for (int poss = 0; poss < len; poss += 512) {
@@ -50,13 +51,11 @@ void check_buffer_all(exec_options *eo, uint8_t *buf, size_t len, off_t fileoffs
                 && (buf[poss+11] + buf[poss+12]*256 <= 4096) // sector_size again
                 )
             check_fat(eo, poss+fileoffset);
-    }
 
-    /* TODO: HFS+
-    if ( (off = check_magic(512, 0, "\x48\x2b", 2, buf, len)) > 0 )
-        check_hfsplus(eo, off+fileoffset);
-    if ( (off = check_magic(512, 0, "\x48\x58", 2, buf, len)) > 0 )
-        check_hfsplus(eo, off+fileoffset);
-    */
+        if ( memcmp("H+", buf+poss, 2) == 0 ) // HFS+
+            check_hfsplus(eo, poss+fileoffset);
+        if ( memcmp("HX", buf+poss, 2) == 0 ) // HFSX
+            check_hfsplus(eo, poss+fileoffset);
+    }
 }
 

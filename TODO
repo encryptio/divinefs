@@ -10,6 +10,14 @@ ffs:
 - test with openbsd ufs2
 - find out if the fs_id is actually formatted a particular way
 
+reiserfs:
+- more thorough testing with real volumes
+
+hfsplus:
+- recognize hfs wrapper
+- search for trailing volume header
+- time machine volumes seem to have lots of volume headers (?)
+
 overall:
 - find and fix terrible bug with buffering
 
