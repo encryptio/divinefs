@@ -14,6 +14,7 @@
 #include "fs/reiserfs.h"
 #include "fs/btrfs.h"
 #include "fs/ntfs.h"
+#include "fs/fat.h"
 
 void check_buffer_all(exec_options *eo, uint8_t *buf, size_t len, off_t fileoffset) {
     for (int poss = 0; poss < len; poss += 512) {
@@ -40,6 +41,15 @@ void check_buffer_all(exec_options *eo, uint8_t *buf, size_t len, off_t fileoffs
 
         if ( memcmp("NTFS    ", buf+poss+0x03, 8) == 0 )
             check_ntfs(eo, poss+fileoffset);
+
+        // FAT
+        if ( (buf[poss+14] != 0 || buf[poss+15] != 0) // reserved nonzero
+                && (buf[poss+16] != 0) // number of fats
+                && (0xF8 <= buf[poss+21] || 0xF0 == buf[poss+21]) // "media" field
+                && (buf[poss+11] + buf[poss+12]*256 >= 512) // sector_size
+                && (buf[poss+11] + buf[poss+12]*256 <= 4096) // sector_size again
+                )
+            check_fat(eo, poss+fileoffset);
     }
 
     /* TODO: HFS+
