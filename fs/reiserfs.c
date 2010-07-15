@@ -35,6 +35,7 @@ void check_reiserfs(exec_options *eo, off_t offset) {
 
     off_t fs_size = ((off_t) block_count) * block_size;
 
+    // nonexistent on 3.5
     uint8_t uuid[16];
     lseek(eo->fh, offset+0x54, SEEK_SET);
     read(eo->fh, uuid, 16);
@@ -51,7 +52,8 @@ void check_reiserfs(exec_options *eo, off_t offset) {
                     (long long unsigned int) fs_size/512,
                     (long long unsigned int) fs_size,
                     format_humansize(eo, fs_size));
-            printf("    uuid %s\n", format_uuid(eo, uuid));
+            if ( fs_type != reiserfs_3_5 )
+                printf("    uuid %s\n", format_uuid(eo, uuid));
             if ( eo->verbose ) {
                 printf("    block size %d bytes\n", block_size);
                 printf("    reiserfs block count %llu\n", (long long unsigned int) block_count);
