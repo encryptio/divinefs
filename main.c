@@ -19,6 +19,9 @@ void usage(char *name) {
 int main(int argc, char **argv) {
     char *progname = argv[0];
 
+    // line-buffered stdout
+    setvbuf(stdout, NULL, _IOLBF, 0);
+
     exec_options eo;
     eo.verbose = 0;
     eo.offset_format_type = offset_format_block_count;
