@@ -11,6 +11,7 @@
 #include "fs/ext.h"
 #include "fs/linuxswap.h"
 #include "fs/ffs.h"
+#include "fs/reiserfs.h"
 
 void check_buffer_all(exec_options *eo, uint8_t *buf, size_t len, off_t fileoffset) {
     for (int poss = 0; poss < len; poss += 512) {
@@ -24,6 +25,13 @@ void check_buffer_all(exec_options *eo, uint8_t *buf, size_t len, off_t fileoffs
             check_ffs(eo, poss+fileoffset);
         if ( memcmp("\x19\x01\x54\x19", buf+poss+348, 4) == 0 ) // UFS2
             check_ffs(eo, poss+fileoffset);
+
+        if ( memcmp("ReIsErFs", buf+poss+0x34, 8) == 0 ) // reiserfs 3.5
+            check_reiserfs(eo, poss+fileoffset);
+        if ( memcmp("ReIsEr2Fs", buf+poss+0x34, 9) == 0 ) // reiserfs 3.6
+            check_reiserfs(eo, poss+fileoffset);
+        if ( memcmp("ReIsEr3Fs", buf+poss+0x34, 9) == 0 ) // reiserfs jr
+            check_reiserfs(eo, poss+fileoffset);
     }
 
     /* TODO: HFS+
