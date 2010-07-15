@@ -84,6 +84,17 @@ void check_ffs(exec_options *eo, off_t offset) {
     offset -= ver == 1 ? 8192 : 65536;
 
     switch ( eo->part_format_type ) {
+        case part_format_bsdlabel:
+            // TODO: is 4.2BSD always valid?
+            printf("  X: % 16lld % 16lld 4.2BSD % 6d % 5d % 4d # %s\n",
+                    (long long) fs_size/512,
+                    (long long) offset/512,
+                    fragment_size,
+                    basic_size,
+                    cpg,
+                    mountpoint);
+            break;
+
         default:
             printf("ufs%d filesystem at offset %s\n", ver, format_offset(eo, offset));
             if ( show_mountpoint )

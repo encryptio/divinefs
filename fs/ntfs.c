@@ -34,6 +34,12 @@ void check_ntfs(exec_options *eo, off_t offset) {
         return;
 
     switch ( eo->part_format_type ) {
+        case part_format_bsdlabel:
+            printf("  X: % 16lld % 16lld   NTFS\n",
+                    (long long) (fs_size+512)/512,
+                    (long long) offset);
+            break;
+
         default:
             printf("ntfs filesystem at offset %s\n", format_offset(eo, offset));
             printf("    filesystem size %llu 512-blocks (sectors) = %llu bytes ~= %s\n",

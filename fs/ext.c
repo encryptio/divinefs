@@ -92,7 +92,7 @@ void check_ext(exec_options *eo, off_t offset) {
             // the bsds only supports "ext2fs"
             // we mark the version here so that an error occurs if the user tries
             // to use this line without knowing what they're doing
-            printf("  X: % 13lld % 13lld %s                    # %s\n",
+            printf("  X: % 16lld % 16lld %s                    # %s\n",
                     (long long int) block_count*block_size,
                     (long long int) offset-1024,
                     ver == 3 ? "ext3fs" : ver == 4 ? "ext4fs" : "ext2fs",

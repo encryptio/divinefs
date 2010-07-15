@@ -73,6 +73,12 @@ void check_fat(exec_options *eo, off_t offset) {
     off_t fs_size = (off_t) sector_count*sector_size;
 
     switch ( eo->part_format_type ) {
+        case part_format_bsdlabel:
+            printf("  X: % 16lld % 16lld  MSDOS\n",
+                    (long long) fs_size/512,
+                    (long long) offset);
+            break;
+
         default:
             printf("fat%d filesystem at offset %s\n", bits, format_offset(eo, offset));
             printf("    filesystem size %llu 512-blocks = %llu bytes ~= %s\n",
