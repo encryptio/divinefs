@@ -7,6 +7,7 @@
 #include <err.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "main.h"
 
@@ -14,10 +15,14 @@
 
 void usage(char *name) {
     fprintf(stderr, "Usage:\n");
-    fprintf(stderr, "    %s [ -v ] [ -s START ] [ -e END ] ( file | device )\n", name);
+    fprintf(stderr, "    %s [ -v ] [ -s START ] [ -e END ] [ -f format ] ( file | device )\n", name);
     fprintf(stderr, "    %s -h\n", name);
     fprintf(stderr, "\n");
     fprintf(stderr, "The start and end switches (-s/-e) take inputs measured in 512-byte blocks.\n");
+    fprintf(stderr, "Valid output formats for -f are:\n");
+    fprintf(stderr, "    talkative (default): spew enough information to make the partition, and as\n");
+    fprintf(stderr, "                         much as possible if used with -v.\n");
+    fprintf(stderr, "    bsdlabel: mostly compatible with openbsd's disklabel\n");
     fprintf(stderr, "\n");
 }
 
@@ -40,10 +45,11 @@ int main(int argc, char **argv) {
             { "help", 0, NULL, 'h' },
             { "start-block", 0, NULL, 's' },
             { "end-block", 0, NULL, 'e' },
+            { "format", 0, NULL, 'f' },
             { NULL, 0, NULL, 0 }
         };
 
-        int c = getopt_long(argc, argv, "vhs:e:", long_options, NULL);
+        int c = getopt_long(argc, argv, "vhs:e:f:", long_options, NULL);
         if ( c == -1 )
             break;
 
@@ -71,6 +77,18 @@ int main(int argc, char **argv) {
                 if ( *optarg ) {
                     usage(progname);
                     errx(1, "Bad argument format for --end-block");
+                }
+                break;
+
+            case 'f':
+                if (       strcmp(optarg, "bsdlabel") == 0
+                        || strcmp(optarg, "disklabel") == 0 ) {
+                    eo.part_format_type = part_format_bsdlabel;
+                } else if ( strcmp(optarg, "talkative") == 0 ) {
+                    eo.part_format_type = part_format_talkative;
+                } else {
+                    usage(progname);
+                    errx(1, "Bad argument for --format");
                 }
                 break;
 
