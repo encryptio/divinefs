@@ -34,6 +34,23 @@ void check_fat(exec_options *eo, off_t offset) {
 
         bits = 32;
         fat_length = fat32_length;
+
+        uint16_t info_sector_offset = read_le_uint16(eo->fh, offset+48);
+        if ( info_sector_offset == 0 )
+            info_sector_offset = 1;
+        
+        uint8_t magic_info_start[4];
+        uint8_t magic_info_end[4];
+
+        lseek(eo->fh, offset+info_sector_offset*512, SEEK_SET);
+        read(eo->fh, magic_info_start, 4);
+        lseek(eo->fh, offset+info_sector_offset*512+484, SEEK_SET);
+        read(eo->fh, magic_info_end, 4);
+
+        if ( memcmp(magic_info_start, "RRaA", 4) != 0 )
+            return;
+        if ( memcmp(magic_info_end,   "rrAa", 4) != 0 )
+            return;
     }
 
     uint32_t sector_count = read_le_uint16(eo->fh, offset+19);
