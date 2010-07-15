@@ -15,6 +15,3 @@ hfsplus:
 - search for trailing volume header
 - time machine volumes seem to have lots of volume headers (?)
 
-overall:
-- find and fix terrible bug with buffering
-
