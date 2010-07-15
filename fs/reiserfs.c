@@ -24,13 +24,13 @@ void check_reiserfs(exec_options *eo, off_t offset) {
     uint32_t free_blocks    = read_le_uint32(eo->fh, offset+0x04);
     uint32_t root_block     = read_le_uint32(eo->fh, offset+0x08);
     uint16_t block_size     = read_le_uint16(eo->fh, offset+0x2C);
-    uint16_t journal_blocks = read_le_uint16(eo->fh, offset+0x4A);
+    uint16_t journal_blocks = read_le_uint16(eo->fh, offset+0x4A); // might be zero for "default size"
 
     if ( free_blocks > block_count || root_block > block_count || journal_blocks > block_count )
         return;
     if ( block_size & 0xFF )
         return;
-    if ( journal_blocks < 513 )
+    if ( journal_blocks < 513 && journal_blocks != 0 )
         return;
 
     off_t fs_size = ((off_t) block_count) * block_size;
@@ -58,9 +58,10 @@ void check_reiserfs(exec_options *eo, off_t offset) {
                 printf("    free blocks %llu (%d%%)\n",
                         (long long unsigned int) free_blocks,
                         (int) (((off_t)free_blocks*100)/block_count));
-                printf("    journal blocks %llu (%s)\n",
-                        (long long unsigned int) journal_blocks,
-                        format_humansize(eo, (off_t) journal_blocks*block_size));
+                if ( journal_blocks )
+                    printf("    journal blocks %llu (%s)\n",
+                            (long long unsigned int) journal_blocks,
+                            format_humansize(eo, (off_t) journal_blocks*block_size));
             }
             printf("\n");
     }
