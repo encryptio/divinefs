@@ -100,6 +100,8 @@ int main(int argc, char **argv) {
                     is_partial_read
                     ? eo.end_block*512-(read_total+eo.start_block*512)
                     : READ_BUFFER_SIZE)) > 0 ) {
+        if ( read_now == -1 )
+            err(1, "Couldn't read from %s", eo.filename);
         check_buffer_all(&eo, buf, read_now, read_total+eo.start_block*512);
 
         if ( eo.verbose )
@@ -118,6 +120,8 @@ int main(int argc, char **argv) {
             read_total -= READ_BUFFER_OVERLAP;
         lseek(eo.fh, read_total+eo.start_block*512, SEEK_SET);
     }
+    if ( read_now == -1 )
+        err(1, "Couldn't read from %s", eo.filename);
 
     if ( close(eo.fh) )
         err(1, "Couldn't close %s", eo.filename);
