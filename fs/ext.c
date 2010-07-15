@@ -10,6 +10,14 @@ void check_ext(exec_options *eo, off_t offset) {
         return;
 
     uint32_t block_count = read_le_uint32(eo->fh, offset+0x04);
+    uint32_t blocks_free = read_le_uint32(eo->fh, offset+0x0C);
+    if ( blocks_free > block_count )
+        return;
+
+    uint32_t inodes_count = read_le_uint32(eo->fh, offset);
+    uint32_t inodes_free  = read_le_uint32(eo->fh, offset+0x10);
+    if ( inodes_free > inodes_count )
+        return;
 
     uint8_t uuid[16];
     lseek(eo->fh, offset+0x68, SEEK_SET);
@@ -103,7 +111,14 @@ void check_ext(exec_options *eo, off_t offset) {
                 printf("    unknown readonly feature buts: 0x%x", readonly_features);
             if ( eo->verbose ) {
                 printf("    block size %d bytes\n", block_size);
-                printf("    ext block count %llu\n", (long long unsigned int) block_count);
+                printf("    free blocks %llu/%llu (%d%%)\n",
+                        (long long unsigned int) blocks_free,
+                        (long long unsigned int) block_count,
+                        (int) (((off_t) blocks_free*100)/block_count));
+                printf("    free inodes %llu/%llu (%d%%)\n",
+                        (long long unsigned int) inodes_free,
+                        (long long unsigned int) inodes_count,
+                        (int) (((off_t) inodes_free*100)/inodes_count));
             }
             printf("\n");
     }
