@@ -18,8 +18,9 @@ void usage(char *name) {
     fprintf(stderr, "    %s [ -v ] [ -s START ] [ -e END ] [ -f format ] ( file | device )\n", name);
     fprintf(stderr, "    %s -h\n", name);
     fprintf(stderr, "\n");
-    fprintf(stderr, "The start and end switches (-s/-e) take inputs measured in 512-byte blocks.\n");
-    fprintf(stderr, "Valid output formats for -f are:\n");
+    fprintf(stderr, "-v: verbose\n");
+    fprintf(stderr, "-s/-e: Start and end blocks for the search (in 512-byte blocks)\n");
+    fprintf(stderr, "-f: output format. valid formats:\n");
     fprintf(stderr, "    talkative (default): spew enough information to make the partition, and as\n");
     fprintf(stderr, "                         much as possible if used with -v.\n");
     fprintf(stderr, "    bsdlabel: mostly compatible with openbsd's disklabel\n");
