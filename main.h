@@ -5,6 +5,7 @@
 #define READ_BUFFER_OVERLAP 0
 
 #include <stdbool.h>
+#include <fcntl.h>
 
 enum offset_format_type {
     offset_format_block_count,
@@ -20,6 +21,12 @@ typedef struct exec_options {
     bool verbose;
     char *filename;
     int fh;
+
+    off_t start_block; // initialized to zero if not given
+
+    bool has_end_block;
+    off_t end_block;
+
     enum offset_format_type offset_format_type;
     enum part_format_type part_format_type;
 } exec_options;
