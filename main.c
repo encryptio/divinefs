@@ -47,9 +47,9 @@ int main(int argc, char **argv) {
         static struct option long_options[] = {
             { "verbose", 0, NULL, 'v' },
             { "help", 0, NULL, 'h' },
-            { "start-block", 0, NULL, 's' },
-            { "end-block", 0, NULL, 'e' },
-            { "format", 0, NULL, 'f' },
+            { "start-block", 1, NULL, 's' },
+            { "end-block", 1, NULL, 'e' },
+            { "format", 1, NULL, 'f' },
             { "skip", 0, NULL, 'S' },
             { NULL, 0, NULL, 0 }
         };
