@@ -4,6 +4,10 @@
 /* Why does this exist?
  * Thank FreeBSD for not allowing unaligned reads on block devices and not
  * documenting this misfeature.
+ *
+ * bug report:
+ * docs/91149: read(2) can return EINVAL for unaligned access to block devices
+ * http://www.freebsd.org/cgi/query-pr.cgi?pr=91149
  */
 
 #include <inttypes.h>
