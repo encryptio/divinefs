@@ -5,7 +5,8 @@ ext:
 - allow finding superblocks other than the first one
 
 ffs:
-- test with freebsd and netbsd
+- test with netbsd, solaris partitions
+- allow finding superblocks other than the first one
 
 reiserfs:
 - more thorough testing with real volumes
@@ -14,4 +15,7 @@ hfsplus:
 - recognize hfs wrapper
 - search for trailing volume header
 - time machine volumes seem to have lots of volume headers (?)
+
+general:
+- test on netbsd, solaris
 
