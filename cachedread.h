@@ -23,8 +23,8 @@ typedef struct block_cache {
 void clear_block_cache(block_cache *bc);
 size_t bc_read(int fh, block_cache *bc, uint8_t *buf, off_t offset, size_t len);
 
-// convenience wrapper for exec_options
-#define EO_READ(eo, buf, off, len) bc_read((eo)->fh, &((eo)->bc), (uint8_t *)(buf), (off), (len))
+// convenience wrapper for file_state (scan.h)
+#define FS_READ(fs, buf, off, len) bc_read((fs)->fh, &((fs)->bc), (uint8_t *)(buf), (off), (len))
 
 #endif
 

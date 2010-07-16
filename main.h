@@ -4,8 +4,6 @@
 #include <stdbool.h>
 #include <fcntl.h>
 
-#include "cachedread.h"
-
 enum offset_format_type {
     offset_format_block_count,
     offset_format_byte_count,
@@ -16,11 +14,10 @@ enum part_format_type {
     part_format_bsdlabel, // format mostly compatible with bsd's disklabel(8)
 };
 
+// holds information given by the user (and defaults)
 typedef struct exec_options {
     bool verbose;
     char *filename;
-    int fh;
-    block_cache bc;
 
     off_t start_block; // initialized to zero if not given
 
@@ -28,8 +25,6 @@ typedef struct exec_options {
     off_t end_block;
 
     bool skip_partitions;
-    bool skip_active;
-    off_t skip_to;
 
     enum offset_format_type offset_format_type;
     enum part_format_type part_format_type;

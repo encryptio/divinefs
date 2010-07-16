@@ -1,6 +1,6 @@
 #include "fs/reiserfs.h"
 
-void check_reiserfs(exec_options *eo, off_t offset) {
+void check_reiserfs(exec_options *eo, file_state *fs, off_t offset) {
     enum fs_type {
         reiserfs_3_5,
         reiserfs_3_6,
@@ -8,7 +8,7 @@ void check_reiserfs(exec_options *eo, off_t offset) {
     } fs_type;
 
     char magic[10];
-    EO_READ(eo, magic, offset+0x34, 10);
+    FS_READ(fs, magic, offset+0x34, 10);
 
     if ( magic[6] == 'F' )
         fs_type = reiserfs_3_5;
@@ -19,11 +19,11 @@ void check_reiserfs(exec_options *eo, off_t offset) {
     else
         errx(1, "internal error: reiserfs magic");
 
-    uint32_t block_count    = read_le_uint32(eo, offset);
-    uint32_t free_blocks    = read_le_uint32(eo, offset+0x04);
-    uint32_t root_block     = read_le_uint32(eo, offset+0x08);
-    uint16_t block_size     = read_le_uint16(eo, offset+0x2C);
-    uint16_t journal_blocks = read_le_uint16(eo, offset+0x4A); // might be zero for "default size"
+    uint32_t block_count    = read_le_uint32(fs, offset);
+    uint32_t free_blocks    = read_le_uint32(fs, offset+0x04);
+    uint32_t root_block     = read_le_uint32(fs, offset+0x08);
+    uint16_t block_size     = read_le_uint16(fs, offset+0x2C);
+    uint16_t journal_blocks = read_le_uint16(fs, offset+0x4A); // might be zero for "default size"
 
     if ( free_blocks > block_count || root_block > block_count || journal_blocks > block_count )
         return;
@@ -36,7 +36,7 @@ void check_reiserfs(exec_options *eo, off_t offset) {
 
     // nonexistent on 3.5
     uint8_t uuid[16];
-    EO_READ(eo, uuid, offset+0x54, 16);
+    FS_READ(fs, uuid, offset+0x54, 16);
 
     // label at +0x64 for 16 bytes
 
@@ -66,9 +66,9 @@ void check_reiserfs(exec_options *eo, off_t offset) {
             printf("\n");
     }
 
-    if ( !eo->skip_active ) {
-        eo->skip_active = true;
-        eo->skip_to = offset-65536+fs_size;
+    if ( !fs->skip_active ) {
+        fs->skip_active = true;
+        fs->skip_to = offset-65536+fs_size;
     }
 }
 

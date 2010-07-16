@@ -1,32 +1,32 @@
 #include "fs/fat.h"
 
-void check_fat(exec_options *eo, off_t offset) {
+void check_fat(exec_options *eo, file_state *fs, off_t offset) {
     uint8_t bits = 0;
 
-    uint16_t sector_size = read_le_uint16(eo, offset+11);
+    uint16_t sector_size = read_le_uint16(fs, offset+11);
     if ( sector_size & 0xFF )
         return;
     if ( sector_size < 512 || sector_size > 4096 )
         return;
 
-    uint8_t sectors_per_cluster = read_uint8(eo, offset+13);
+    uint8_t sectors_per_cluster = read_uint8(fs, offset+13);
     if ( sectors_per_cluster == 0 )
         return;
 
-    uint8_t reserved_sectors = read_le_uint16(eo, offset+14);
+    uint8_t reserved_sectors = read_le_uint16(fs, offset+14);
     if ( reserved_sectors == 0 )
         return;
 
-    uint8_t fat_count = read_uint8(eo, offset+16);
+    uint8_t fat_count = read_uint8(fs, offset+16);
     if ( fat_count == 0 )
         return;
 
-    uint8_t media = read_uint8(eo, offset+21);
+    uint8_t media = read_uint8(fs, offset+21);
     if ( !(0xF8 <= media || 0xF0 == media) )
         return;
 
-    uint32_t fat_length = read_le_uint16(eo, offset+22);
-    uint32_t fat32_length = read_le_uint32(eo, offset+36);
+    uint32_t fat_length = read_le_uint16(fs, offset+22);
+    uint32_t fat32_length = read_le_uint32(fs, offset+36);
     if ( fat_length == 0 ) {
         if ( fat32_length == 0 )
             return;
@@ -34,15 +34,15 @@ void check_fat(exec_options *eo, off_t offset) {
         bits = 32;
         fat_length = fat32_length;
 
-        uint16_t info_sector_offset = read_le_uint16(eo, offset+48);
+        uint16_t info_sector_offset = read_le_uint16(fs, offset+48);
         if ( info_sector_offset == 0 )
             info_sector_offset = 1;
         
         uint8_t magic_info_start[4];
         uint8_t magic_info_end[4];
 
-        EO_READ(eo, magic_info_start, offset+info_sector_offset*512,     4);
-        EO_READ(eo, magic_info_end,   offset+info_sector_offset*512+484, 4);
+        FS_READ(fs, magic_info_start, offset+info_sector_offset*512,     4);
+        FS_READ(fs, magic_info_end,   offset+info_sector_offset*512+484, 4);
 
         if ( memcmp(magic_info_start, "RRaA", 4) != 0 )
             return;
@@ -50,14 +50,14 @@ void check_fat(exec_options *eo, off_t offset) {
             return;
     }
 
-    uint32_t sector_count = read_le_uint16(eo, offset+19);
+    uint32_t sector_count = read_le_uint16(fs, offset+19);
     if ( sector_count == 0 ) {
-        sector_count = read_le_uint32(eo, offset+32);
+        sector_count = read_le_uint32(fs, offset+32);
         if ( sector_count == 0 )
             return;
     }
 
-    uint16_t dir_space = read_le_uint16(eo, offset+17) * 18 / 512;;
+    uint16_t dir_space = read_le_uint16(fs, offset+17) * 18 / 512;;
 
     uint32_t total_clusters = (sector_count - reserved_sectors
                                - fat_count*fat_length - dir_space)
@@ -92,9 +92,9 @@ void check_fat(exec_options *eo, off_t offset) {
             printf("\n");
     }
 
-    if ( !eo->skip_active ) {
-        eo->skip_active = true;
-        eo->skip_to = offset+fs_size;
+    if ( !fs->skip_active ) {
+        fs->skip_active = true;
+        fs->skip_to = offset+fs_size;
     }
 }
 

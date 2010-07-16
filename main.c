@@ -41,8 +41,6 @@ int main(int argc, char **argv) {
     eo.start_block = 0;
     eo.has_end_block = false;
     eo.skip_partitions = false;
-    eo.skip_active = false;
-    clear_block_cache(&eo.bc);
 
     while ( true ) {
         static struct option long_options[] = {

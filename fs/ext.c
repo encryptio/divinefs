@@ -1,30 +1,30 @@
 #include "fs/ext.h"
 
-void check_ext(exec_options *eo, off_t offset) {
-    uint16_t this_block_group_index = read_le_uint16(eo, offset+0x5A);
+void check_ext(exec_options *eo, file_state *fs, off_t offset) {
+    uint16_t this_block_group_index = read_le_uint16(fs, offset+0x5A);
     if ( this_block_group_index != 0 )
         return;
 
-    uint32_t block_size = 1 << (read_le_uint32(eo, offset+0x18)+10);
+    uint32_t block_size = 1 << (read_le_uint32(fs, offset+0x18)+10);
     if ( block_size < 1024 || block_size > 8192 )
         return;
 
-    uint32_t block_count = read_le_uint32(eo, offset+0x04);
-    uint32_t blocks_free = read_le_uint32(eo, offset+0x0C);
+    uint32_t block_count = read_le_uint32(fs, offset+0x04);
+    uint32_t blocks_free = read_le_uint32(fs, offset+0x0C);
     if ( blocks_free > block_count )
         return;
 
-    uint32_t inodes_count = read_le_uint32(eo, offset);
-    uint32_t inodes_free  = read_le_uint32(eo, offset+0x10);
+    uint32_t inodes_count = read_le_uint32(fs, offset);
+    uint32_t inodes_free  = read_le_uint32(fs, offset+0x10);
     if ( inodes_free > inodes_count )
         return;
 
     uint8_t uuid[16];
-    EO_READ(eo, uuid, offset+0x68, 16);
+    FS_READ(fs, uuid, offset+0x68, 16);
     
     bool show_mountpoint = true;
     char mountpoint[64];
-    EO_READ(eo, mountpoint, offset+136, 64);
+    FS_READ(fs, mountpoint, offset+136, 64);
 
     // make sure the mountpoint text is printable
     int i;
@@ -40,9 +40,9 @@ void check_ext(exec_options *eo, off_t offset) {
         show_mountpoint = false;
 
     // figure out what version we're dealing with
-    uint32_t compat_features   = read_le_uint32(eo, offset+0x5C);
-    uint32_t incompat_features = read_le_uint32(eo, offset+0x60);
-    uint32_t readonly_features = read_le_uint32(eo, offset+0x64);
+    uint32_t compat_features   = read_le_uint32(fs, offset+0x5C);
+    uint32_t incompat_features = read_le_uint32(fs, offset+0x60);
+    uint32_t readonly_features = read_le_uint32(fs, offset+0x64);
 
     int ver = 2;
 
@@ -74,7 +74,7 @@ void check_ext(exec_options *eo, off_t offset) {
     char *status_str;
     bool clean = false;
 
-    uint16_t status = read_le_uint16(eo, offset+0x3A);
+    uint16_t status = read_le_uint16(fs, offset+0x3A);
     if ( status == 0x0001 ) {
         status_str = "clean";
         clean = true;
@@ -136,9 +136,9 @@ void check_ext(exec_options *eo, off_t offset) {
             printf("\n");
     }
 
-    if ( !eo->skip_active ) {
-        eo->skip_active = true;
-        eo->skip_to = offset-1024+(off_t)block_count*block_size;
+    if ( !fs->skip_active ) {
+        fs->skip_active = true;
+        fs->skip_to = offset-1024+(off_t)block_count*block_size;
     }
 }
 

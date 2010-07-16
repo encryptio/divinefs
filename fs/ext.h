@@ -3,7 +3,7 @@
 
 #include "fs/common.h"
 
-void check_ext(exec_options *eo, off_t offset);
+void check_ext(exec_options *eo, file_state *fs, off_t offset);
 
 #endif
 

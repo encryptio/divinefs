@@ -13,6 +13,8 @@
 
 #include "format.h"
 #include "util.h"
+#include "scan.h"
+#include "cachedread.h"
 
 #endif
 
