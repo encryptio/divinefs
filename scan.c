@@ -90,6 +90,10 @@ void scan_file(exec_options *eo) {
             break;
     }
 
+    // clear the progress line
+    if ( eo->verbose )
+        fprintf(stderr, "\r\033[K");
+
     if ( close(fs.fh) )
         err(1, "Couldn't close %s", eo->filename);
 }
