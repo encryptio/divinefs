@@ -24,7 +24,6 @@ void check_ext(exec_options *eo, file_state *fs, off_t offset) {
     uint8_t uuid[16];
     FS_READ(fs, uuid, offset+0x68, 16);
     
-    bool show_mountpoint = true;
     char mountpoint[MOUNTPOINT_SIZE];
     FS_READ(fs, mountpoint, offset+136, MOUNTPOINT_SIZE);
 
@@ -38,8 +37,6 @@ void check_ext(exec_options *eo, file_state *fs, off_t offset) {
     }
     if ( i == MOUNTPOINT_SIZE )
         return;
-    if ( i == 0 )
-        show_mountpoint = false;
 
     // figure out what version we're dealing with
     uint32_t compat_features   = read_le_uint32(fs, offset+0x5C);
@@ -107,7 +104,7 @@ void check_ext(exec_options *eo, file_state *fs, off_t offset) {
             if ( !clean || needs_journal_playback || eo->verbose )
                 printf("    %s %s\n", status_str, needs_journal_playback ? "(needs journal playback)" : "");
 
-            if ( show_mountpoint )
+            if ( *mountpoint )
                 printf("    last mounted on %s\n", mountpoint);
 
             printf("    filesystem size %llu 512-blocks = %llu bytes ~= %s\n",

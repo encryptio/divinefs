@@ -24,7 +24,6 @@ void check_ffs(exec_options *eo, file_state *fs, off_t offset) {
     fs_id[0] = read_le_uint32(fs, offset+144);
     fs_id[1] = read_le_uint32(fs, offset+148);
 
-    bool show_mountpoint = true;
     char mountpoint[MOUNTPOINT_SIZE];
     FS_READ(fs, mountpoint, offset+212, MOUNTPOINT_SIZE);
 
@@ -38,8 +37,6 @@ void check_ffs(exec_options *eo, file_state *fs, off_t offset) {
     }
     if ( i == MOUNTPOINT_SIZE )
         return;
-    if ( i == 0 )
-        show_mountpoint = false;
 
     // filesystem size
     uint32_t ffs1_size = read_le_uint32(fs, offset+0x24);
@@ -98,7 +95,7 @@ void check_ffs(exec_options *eo, file_state *fs, off_t offset) {
 
         default:
             printf("ufs%d filesystem at offset %s\n", ver, format_offset(eo, offset));
-            if ( show_mountpoint )
+            if ( *mountpoint )
                 printf("    last mounted on %s\n", mountpoint);
             if ( eo->verbose )
                 printf("    filesystem id %04x-%04x\n", fs_id[0], fs_id[1]);
