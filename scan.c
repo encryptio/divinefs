@@ -63,7 +63,7 @@ void scan_file(exec_options *eo) {
     while ( (ret = EO_READ(eo, block, off, 512)) > 0 ) {
         check_magic_numbers(eo, block, off);
 
-        if ( eo->verbose && (off & 0xffff) == 0 ) {
+        if ( eo->verbose && (off & 0xfffff) == 0 ) {
             if ( eo->has_end_block )
                 fprintf(stderr, "\r\033[K%lld/%lld blocks (%.2f%%)\r",
                         (long long) (off/512-eo->start_block),
