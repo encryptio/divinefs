@@ -14,7 +14,7 @@ void check_ffs(exec_options *eo, file_state *fs, off_t offset) {
     else
         return;
 
-    // now we'll point to the actual start of the partition...
+    // now we'll point to the actual start of the superblock
     offset -= 1024;
     if ( offset < 0 )
         return;

@@ -54,12 +54,14 @@ void check_ext(exec_options *eo, file_state *fs, off_t offset) {
     readonly_features &= ~0x0003; // sparse_super,large_file
 
     if ( compat_features & 0x0004 || incompat_features & 0x0048 ) {
+        // ext3 features used
         ver = 3;
         compat_features   &= ~0x0004; // has_journal
         incompat_features &= ~0x0048; // extents,journal_dev
     }
 
     if ( incompat_features & 0x0280 || readonly_features & 0x0078 ) {
+        // ext4 features used
         ver = 4;
         incompat_features &= ~0x0280; // flex_bg,64bit
         readonly_features &= ~0x0078; // huge_file,dir_nlink,extra_isize,gdt_csum
@@ -69,7 +71,7 @@ void check_ext(exec_options *eo, file_state *fs, off_t offset) {
 
     if ( incompat_features & 0x0004 ) {
         needs_journal_playback = true;
-        incompat_features &= ~0x0004;
+        incompat_features &= ~0x0004; // needs journal playback
     }
 
     // read the "status" field
