@@ -2,32 +2,30 @@
 
 void check_btrfs(exec_options *eo, off_t offset) {
     uint8_t uuid[16];
-    lseek(eo->fh, offset+0x20, SEEK_SET);
-    read(eo->fh, uuid, 16);
+    EO_READ(eo, uuid, offset+0x20, 16);
 
     uint8_t uuid_again[16]; // redundant information - for verification
     uint8_t uuid_dev[16];
-    lseek(eo->fh, offset+0x10B, SEEK_SET);
-    read(eo->fh, uuid_dev, 16);
-    read(eo->fh, uuid_again, 16);
+    EO_READ(eo, uuid_dev, offset+0x10B, 16);
+    EO_READ(eo, uuid_again, offset+0x11B, 16);
 
     if ( memcmp(uuid, uuid_again, 16) != 0 )
         return;
     
-    int64_t this_super_offset_from_start = read_le_int64(eo->fh, offset+0x30);
+    int64_t this_super_offset_from_start = read_le_int64(eo, offset+0x30);
     if ( offset-this_super_offset_from_start < 0 )
         return;
-    int64_t fs_size = read_le_int64(eo->fh, offset+0x70);
-    int64_t bytes_used = read_le_int64(eo->fh, offset+0x78);
+    int64_t fs_size = read_le_int64(eo, offset+0x70);
+    int64_t bytes_used = read_le_int64(eo, offset+0x78);
     if ( bytes_used > fs_size )
         return;
 
-    int64_t num_devices = read_le_int64(eo->fh, offset+0x88);
+    int64_t num_devices = read_le_int64(eo, offset+0x88);
     if ( num_devices < 1 )
         return;
 
-    int64_t dev_fs_size = read_le_int64(eo->fh, offset+0xC9+0x08);
-    int64_t dev_bytes_used = read_le_int64(eo->fh, offset+0xC9+0x10);
+    int64_t dev_fs_size = read_le_int64(eo, offset+0xC9+0x08);
+    int64_t dev_bytes_used = read_le_int64(eo, offset+0xC9+0x10);
     if ( dev_bytes_used > dev_fs_size )
         return;
 

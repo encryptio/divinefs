@@ -8,25 +8,25 @@ void check_hfsplus(exec_options *eo, off_t offset) {
         hfsx,
     } fs_type;
 
-    if ( read_uint8(eo->fh, offset+1) == '+' )
+    if ( read_uint8(eo, offset+1) == '+' )
         fs_type = hfsplus;
-    else if ( read_uint8(eo->fh, offset+1) == 'X' )
+    else if ( read_uint8(eo, offset+1) == 'X' )
         fs_type = hfsx;
     else
         errx(1, "Internal error: magic is wrong");
 
-    uint16_t version = read_be_uint16(eo->fh, offset+2);
+    uint16_t version = read_be_uint16(eo, offset+2);
     if ( version < 4 || version > 5 )
         return;
 
-    uint32_t file_count = read_be_uint32(eo->fh, offset+32);
-    uint32_t dir_count  = read_be_uint32(eo->fh, offset+36);
+    uint32_t file_count = read_be_uint32(eo, offset+32);
+    uint32_t dir_count  = read_be_uint32(eo, offset+36);
     if ( file_count == 0 )
         return;
 
-    uint32_t blocksize = read_be_uint32(eo->fh, offset+40);
-    uint32_t totalblocks = read_be_uint32(eo->fh, offset+44);
-    uint32_t freeblocks = read_be_uint32(eo->fh, offset+48);
+    uint32_t blocksize = read_be_uint32(eo, offset+40);
+    uint32_t totalblocks = read_be_uint32(eo, offset+44);
+    uint32_t freeblocks = read_be_uint32(eo, offset+48);
     off_t fs_size = blocksize*totalblocks;
 
     if ( freeblocks > totalblocks )
@@ -35,7 +35,7 @@ void check_hfsplus(exec_options *eo, off_t offset) {
         return;
 
     // verify the allocation file exists
-    uint64_t allocation_file_size = read_be_uint64(eo->fh, offset+112);
+    uint64_t allocation_file_size = read_be_uint64(eo, offset+112);
     if ( allocation_file_size*8 < totalblocks )
         return;
 

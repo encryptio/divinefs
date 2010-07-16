@@ -1,11 +1,10 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-#define READ_BUFFER_SIZE (1<<20)
-#define READ_BUFFER_OVERLAP 0
-
 #include <stdbool.h>
 #include <fcntl.h>
+
+#include "cachedread.h"
 
 enum offset_format_type {
     offset_format_block_count,
@@ -21,6 +20,7 @@ typedef struct exec_options {
     bool verbose;
     char *filename;
     int fh;
+    block_cache bc;
 
     off_t start_block; // initialized to zero if not given
 

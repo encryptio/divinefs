@@ -2,7 +2,7 @@
 
 void check_ffs(exec_options *eo, off_t offset) {
     // offset is 1KiB into the superblock due to the magic position
-    uint32_t magic = read_le_uint32(eo->fh, offset+348);
+    uint32_t magic = read_le_uint32(eo, offset+348);
 
     int ver = 0;
     if ( magic == 0x00011954 )
@@ -19,13 +19,12 @@ void check_ffs(exec_options *eo, off_t offset) {
 
     // read some basic information
     uint32_t fs_id[2];
-    fs_id[0] = read_le_uint32(eo->fh, offset+144);
-    fs_id[1] = read_le_uint32(eo->fh, offset+148);
+    fs_id[0] = read_le_uint32(eo, offset+144);
+    fs_id[1] = read_le_uint32(eo, offset+148);
 
     bool show_mountpoint = true;
     char mountpoint[468];
-    lseek(eo->fh, offset+212, SEEK_SET);
-    read(eo->fh, mountpoint, 468);
+    EO_READ(eo, mountpoint, offset+212, 468);
 
     // make sure the mountpoint text is printable
     int i;
@@ -41,11 +40,11 @@ void check_ffs(exec_options *eo, off_t offset) {
         show_mountpoint = false;
 
     // filesystem size
-    uint32_t ffs1_size = read_le_uint32(eo->fh, offset+0x24);
-    uint64_t ffs2_size = read_le_uint64(eo->fh, offset+0x438);
-    uint32_t fragment_size = read_le_uint32(eo->fh, offset+0x34);
-    uint32_t basic_size = read_le_uint32(eo->fh, offset+0x30);
-    uint32_t cpg = read_le_uint32(eo->fh, offset+0xB4);
+    uint32_t ffs1_size = read_le_uint32(eo, offset+0x24);
+    uint64_t ffs2_size = read_le_uint64(eo, offset+0x438);
+    uint32_t fragment_size = read_le_uint32(eo, offset+0x34);
+    uint32_t basic_size = read_le_uint32(eo, offset+0x30);
+    uint32_t cpg = read_le_uint32(eo, offset+0xB4);
     off_t fs_size;
     if ( ver == 1 )
         fs_size = ((off_t)ffs1_size)*fragment_size;
@@ -68,13 +67,13 @@ void check_ffs(exec_options *eo, off_t offset) {
     off_t alt_offset = offset + (ver == 1 ? 8192 : 16384);
 
     uint32_t fs_id2[2];
-    fs_id2[0] = read_le_uint32(eo->fh, alt_offset+144);
-    fs_id2[1] = read_le_uint32(eo->fh, alt_offset+148);
+    fs_id2[0] = read_le_uint32(eo, alt_offset+144);
+    fs_id2[1] = read_le_uint32(eo, alt_offset+148);
 
     if ( memcmp(fs_id, fs_id2, 8) != 0 )
         return;
 
-    uint32_t magic2 = read_le_uint32(eo->fh, alt_offset+1024+348);
+    uint32_t magic2 = read_le_uint32(eo, alt_offset+1024+348);
     if ( magic != magic2 )
         return;
 

@@ -11,7 +11,6 @@
 
 #include "main.h"
 
-#include "check.h"
 #include "format.h"
 #include "util.h"
 
