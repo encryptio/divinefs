@@ -1,5 +1,7 @@
 #include "fs/ext.h"
 
+#define MOUNTPOINT_SIZE 64
+
 void check_ext(exec_options *eo, file_state *fs, off_t offset) {
     uint16_t this_block_group_index = read_le_uint16(fs, offset+0x5A);
     if ( this_block_group_index != 0 )
@@ -23,18 +25,18 @@ void check_ext(exec_options *eo, file_state *fs, off_t offset) {
     FS_READ(fs, uuid, offset+0x68, 16);
     
     bool show_mountpoint = true;
-    char mountpoint[64];
-    FS_READ(fs, mountpoint, offset+136, 64);
+    char mountpoint[MOUNTPOINT_SIZE];
+    FS_READ(fs, mountpoint, offset+136, MOUNTPOINT_SIZE);
 
     // make sure the mountpoint text is printable
     int i;
-    for (i = 0; i < 64; i++) {
+    for (i = 0; i < MOUNTPOINT_SIZE; i++) {
         if ( !mountpoint[i] )
             break;
         if ( !isprint(mountpoint[i]) )
             return;
     }
-    if ( i == 64 )
+    if ( i == MOUNTPOINT_SIZE )
         return;
     if ( i == 0 )
         show_mountpoint = false;

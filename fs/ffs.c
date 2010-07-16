@@ -1,5 +1,7 @@
 #include "fs/ffs.h"
 
+#define MOUNTPOINT_SIZE 468
+
 void check_ffs(exec_options *eo, file_state *fs, off_t offset) {
     // offset is 1KiB into the superblock due to the magic position
     uint32_t magic = read_le_uint32(fs, offset+348);
@@ -23,18 +25,18 @@ void check_ffs(exec_options *eo, file_state *fs, off_t offset) {
     fs_id[1] = read_le_uint32(fs, offset+148);
 
     bool show_mountpoint = true;
-    char mountpoint[468];
-    FS_READ(fs, mountpoint, offset+212, 468);
+    char mountpoint[MOUNTPOINT_SIZE];
+    FS_READ(fs, mountpoint, offset+212, MOUNTPOINT_SIZE);
 
     // make sure the mountpoint text is printable
     int i;
-    for (i = 0; i < 468; i++) {
+    for (i = 0; i < MOUNTPOINT_SIZE; i++) {
         if ( !mountpoint[i] )
             break;
         if ( !isprint(mountpoint[i]) )
             return;
     }
-    if ( i == 468 )
+    if ( i == MOUNTPOINT_SIZE )
         return;
     if ( i == 0 )
         show_mountpoint = false;
