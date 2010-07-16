@@ -27,7 +27,7 @@ void check_hfsplus(exec_options *eo, off_t offset) {
     uint32_t blocksize = read_be_uint32(eo, offset+40);
     uint32_t totalblocks = read_be_uint32(eo, offset+44);
     uint32_t freeblocks = read_be_uint32(eo, offset+48);
-    off_t fs_size = blocksize*totalblocks;
+    off_t fs_size = (off_t) blocksize*totalblocks;
 
     if ( freeblocks > totalblocks )
         return;
