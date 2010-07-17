@@ -18,4 +18,5 @@ hfsplus:
 
 general:
 - test on netbsd, solaris
+- add option to ignore read errors
 
