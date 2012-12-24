@@ -33,21 +33,21 @@ void clear_block_cache(block_cache *bc) {
 // on eof, returns 0 and sets the buf to all zero bytes
 // FIXME: partial reads return len, even though the data actually put in buf is less
 
-size_t bc_read(int fh, block_cache *bc, uint8_t *buf, off_t offset, size_t len) {
+ssize_t bc_read(int fh, block_cache *bc, uint8_t *buf, off_t offset, size_t len) {
     off_t blockid = offset & ~CACHE_BLOCK_MASK;
     off_t off_in_block = offset & CACHE_BLOCK_MASK;
 
     if ( len + off_in_block > CACHE_BLOCK_SIZE ) {
         // read is too big for one block, do it in chunks.
 
-        size_t ret = 0;
+        ssize_t ret = 0;
 
         size_t size_in_first_block = CACHE_BLOCK_SIZE-off_in_block;
         size_t size_in_last_block  = (offset+len) & CACHE_BLOCK_MASK;
 
         off_t last_blockid = (offset+len) & ~CACHE_BLOCK_MASK;
 
-        size_t thisret = bc_read(fh, bc, buf, offset, size_in_first_block);
+        ssize_t thisret = bc_read(fh, bc, buf, offset, size_in_first_block);
         if ( thisret <= 0 )
             return thisret;
         ret += thisret;
